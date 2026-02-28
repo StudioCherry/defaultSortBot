@@ -1,4 +1,4 @@
-# defaultSortBot [![Build Status](https://travis-ci.org/kn1cht/defaultSortBot.svg?branch=master)](https://travis-ci.org/kn1cht/defaultSortBot) [![Coverage Status](https://coveralls.io/repos/github/kn1cht/defaultSortBot/badge.svg?branch=master)](https://coveralls.io/github/kn1cht/defaultSortBot?branch=master) [![Greenkeeper badge](https://badges.greenkeeper.io/kn1cht/defaultSortBot.svg)](https://greenkeeper.io/)
+# defaultSortBot [![Greenkeeper badge](https://badges.greenkeeper.io/kn1cht/defaultSortBot.svg)](https://greenkeeper.io/)
 
 Add **Japanese**
 [sort key](https://ja.wikipedia.org/wiki/Help:%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA#.E3.82.BD.E3.83.BC.E3.83.88.E3.82.AD.E3.83.BC)

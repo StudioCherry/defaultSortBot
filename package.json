@@ -7,8 +7,7 @@
     "test": "npm run lint && npm run mocha",
     "lint": "eslint *.js",
     "mocha": "NODE_ENV=test mocha --require intelli-espower-loader",
-    "istanbul": "NODE_ENV=test istanbul cover _mocha",
-    "coveralls": "npm run istanbul && node ./node_modules/coveralls/bin/coveralls.js < ./coverage/lcov.info"
+    "istanbul": "NODE_ENV=test istanbul cover _mocha"
   },
   "repository": {
     "type": "git",
@@ -28,7 +27,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.4",
     "@eslint/js": "^10.0.1",
-    "coveralls": "^3.0.12",
     "eslint": "^10.0.2",
     "globals": "^17.3.0",
     "intelli-espower-loader": "^1.0.1",
