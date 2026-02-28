@@ -8,7 +8,7 @@ const csrftoken = '00112233445566778899aabbccddeeff+\\';
 
 const fakeAPI = {
   server : 'http://' + config.server,
-  path   : config.path + '/api.php'
+  path: /\/wiki\/api\.php/
 };
 
 fakeAPI.title = {
@@ -30,30 +30,45 @@ fakeAPI.ans = {
 };
 
 fakeAPI.login = {
-  request : (body) => (
-    body.action === 'login' &&
-    body.lgname === config.username &&
-    body.lgpassword === config.password
-  ),
-  reply : {
-    login : {
-      result     : 'Success',
-      lguserid   : 12345,
-      lgusername : config.username
+  request: (body) => {
+    if (typeof body === 'string') { body = require('querystring').parse(body); }
+    return body.action === 'login' &&
+      body.lgname === config.username &&
+      body.lgpassword === config.password;
+  },
+  reply: function (uri, requestBody) {
+    const req = require('querystring').parse(requestBody);
+    if (req.lgtoken) {
+      return {
+        login: {
+          result: 'Success',
+          lguserid: 12345,
+          lgusername: config.username
+        }
+      };
     }
+    return {
+      login: {
+        result: 'NeedToken',
+        token: 'faketoken'
+      }
+    };
   }
 };
 
 fakeAPI.loginfail = {
-  request : (body) => (
-    body.action === 'login' &&
-    body.lgname === config.username &&
-    body.lgpassword === config.password
-  ),
-  reply : {
-    login : {
-      result : 'WrongPass'
+  request: (body) => {
+    if (typeof body === 'string') { body = require('querystring').parse(body); }
+    return body.action === 'login' &&
+      body.lgname === config.username &&
+      body.lgpassword === config.password;
+  },
+  reply: function (uri, requestBody) {
+    const req = require('querystring').parse(requestBody);
+    if (req.lgtoken) {
+      return { login: { result: 'WrongPass' } };
     }
+    return { login: { result: 'NeedToken', token: 'faketoken' } };
   }
 };
 
@@ -82,7 +97,8 @@ fakeAPI.edit = {
 fakeAPI.query = {
   request : (query) => (query.action === 'query'),
   reply   : function() {
-    const query = querystring.parse((this.req.path.split('?').slice(-1))[0]);
+    const qs = this.req.path.includes('?') ? this.req.path.split('?')[1] : '';
+    const query = querystring.parse(qs);
     if(query.list === 'allpages') {
       return fakeAPI.query.allpages(query);
     }
@@ -94,6 +110,9 @@ fakeAPI.query = {
     }
     else if(query.meta === 'tokens' && query.type === 'csrf') {
       return fakeAPI.query.csrftokens();
+    }
+    else if (query.prop === 'info' && query.intoken === 'edit') {
+      return fakeAPI.query.info(query);
     }
   },
   allpages : function(query) {
@@ -126,6 +145,18 @@ fakeAPI.query = {
   },
   csrftokens : function() {
     return  { batchcomplete : '', query : { tokens : { csrftoken : csrftoken }}};
+  },
+  info: function (query) {
+    return {
+      batchcomplete: '', query: {
+        pages: {
+          1: {
+            title: query.titles,
+            edittoken: csrftoken
+          }
+        }
+      }
+    };
   }
 };
 

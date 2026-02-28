@@ -38,36 +38,29 @@ describe('defaultSortBot', function() {
     delete require.cache[require.resolve('../main.js')];
     nock.cleanAll();
   });
-  it('find page without sort key and add proper sort key', (done) => {
+  it('find page without sort key and add proper sort key', async () => {
     nock(fakeAPI.server).persist()
       .post(fakeAPI.path, fakeAPI.login.request).reply(200, fakeAPI.login.reply)
       .get(fakeAPI.path).query(fakeAPI.query.request).reply(200, fakeAPI.query.reply);
     const edit = nock(fakeAPI.server)
       .post(fakeAPI.path, fakeAPI.edit.request).times(4).reply(200, fakeAPI.edit.reply);
 
-    main.__get__('main')();
-    const interval = setInterval(() => {
-      if(edit.isDone() === true) {
-        edit.done(); // nock assertion
-        done();
-        clearInterval(interval);
-      }
-    }, 100);
+    await main.__get__('main')();
+    assert(edit.isDone() === true);
   });
-  it('if there is error, abort and display it', (done) => {
+  it('if there is error, abort and display it', async () => {
     const login = nock(fakeAPI.server)
-      .post(fakeAPI.path, fakeAPI.loginfail.request).reply(200, fakeAPI.loginfail.reply);
+      .post(fakeAPI.path, fakeAPI.loginfail.request).times(2).reply(200, fakeAPI.loginfail.reply);
     const edit = nock(fakeAPI.server)
       .post(fakeAPI.path, fakeAPI.edit.request).times(4).reply(200, fakeAPI.edit.reply);
 
-    main.__get__('main')();
-    const interval = setInterval(() => {
-      if(login.isDone() === true) {
-        assert(edit.isDone() === false);
-        done();
-        clearInterval(interval);
-      }
-    }, 100);
+    try {
+      await main.__get__('main')();
+      assert.fail('Should have thrown an error');
+    } catch (err) {
+      assert(login.isDone() === true);
+      assert(edit.isDone() === false);
+    }
   });
 });
 
